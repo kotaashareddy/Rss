@@ -15,11 +15,9 @@ import {
   PanelLeftOpen,
 } from "lucide-react"
 import { ArticleCard } from "@/components/ArticleCard"
-import type { Selection } from "@/components/Sidebar"
 import { refreshAllFeeds, refreshFolder } from "@/server/rss"
 
 type FilterType = "All"
-
 
 export interface ArticleRow {
   id: string
@@ -42,7 +40,9 @@ export interface ArticleRow {
 
 interface ArticleGridProps {
   articles: ArticleRow[]
-  selection: Selection
+  title: string
+  /** Optional folderId used when refreshing a folder's feeds */
+  folderId?: string
   onAddFeedClick: () => void
   onRefreshed: () => void
   sidebarOpen: boolean
@@ -59,23 +59,10 @@ function getDomain(url: string) {
   }
 }
 
-
-
-function getSelectionTitle(selection: Selection): string {
-  switch (selection.type) {
-    case "all": return "All Articles"
-    case "today": return "Today"
-    case "bookmarks": return "Bookmarks"
-    case "readLater": return "Read Later"
-    case "favorites": return "Favorites"
-    case "folder": return "Folder"
-    case "feed": return "Feed"
-  }
-}
-
 export function ArticleGrid({
   articles,
-  selection,
+  title,
+  folderId,
   onAddFeedClick,
   onRefreshed,
   sidebarOpen,
@@ -110,8 +97,8 @@ export function ArticleGrid({
   const handleRefresh = async () => {
     setRefreshing(true)
     try {
-      if (selection.type === "folder") {
-        await refreshFolder({ data: { folderId: selection.folderId } })
+      if (folderId) {
+        await refreshFolder({ data: { folderId } })
       } else {
         await refreshAllFeeds()
       }
@@ -212,7 +199,7 @@ export function ArticleGrid({
         {filtered.length === 0 ? (
           <div className="flex h-64 flex-col items-center justify-center gap-3">
             <p className="text-sm text-zinc-600">
-              No articles in {getSelectionTitle(selection)}.
+              No articles in {title}.
             </p>
             <Button
               variant="ghost"

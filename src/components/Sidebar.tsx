@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Link, useRouterState } from "@tanstack/react-router"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -17,8 +18,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Plus, ChevronRight, ChevronDown, PanelLeftClose, Heart, Newspaper, Calendar, Bookmark, Clock } from "lucide-react"
+import { Plus, ChevronRight, ChevronDown, PanelLeftClose, Heart, Newspaper, Calendar } from "lucide-react"
 import { deleteFolder, deleteFeed } from "@/server/rss"
+import { slugify } from "@/lib/slugify"
 
 export interface FeedRow {
   id: string
@@ -34,11 +36,9 @@ export interface FolderRow {
 export type Selection =
   | { type: "all" }
   | { type: "today" }
-  | { type: "bookmarks" }
-  | { type: "readLater" }
   | { type: "favorites" }
   | { type: "folder"; folderId: string }
-  | { type: "feed"; feedId: string }
+  | { type: "feed"; feedId: string; folderId: string }
 
 interface SidebarProps {
   folders: FolderRow[]
@@ -46,11 +46,7 @@ interface SidebarProps {
   articleCounts: Record<string, number>
   totalCount: number
   todayCount: number
-  bookmarksCount: number
-  readLaterCount: number
   favoritesCount: number
-  selection: Selection
-  onSelect: (s: Selection) => void
   onAddFolderClick: () => void
   onAddFeedClick: () => void
   onRefreshData: () => Promise<void>
@@ -63,11 +59,7 @@ export function Sidebar({
   articleCounts,
   totalCount,
   todayCount,
-  bookmarksCount,
-  readLaterCount,
   favoritesCount,
-  selection,
-  onSelect,
   onAddFolderClick,
   onAddFeedClick,
   onRefreshData,
@@ -75,30 +67,11 @@ export function Sidebar({
 }: SidebarProps) {
   const [expandedFolders, setExpandedFolders] = useState<Record<string, boolean>>({})
   const [deleteDialogItem, setDeleteDialogItem] = useState<{ type: "folder" | "feed", id: string, name: string } | null>(null)
+  const routerState = useRouterState()
+  const pathname = routerState.location.pathname
 
   const toggleFolder = (folderId: string) => {
     setExpandedFolders((prev) => ({ ...prev, [folderId]: !prev[folderId] }))
-  }
-
-  const isActive = (s: Selection): boolean => {
-    if (s.type === "all" && selection.type === "all") return true
-    if (s.type === "today" && selection.type === "today") return true
-    if (s.type === "bookmarks" && selection.type === "bookmarks") return true
-    if (s.type === "readLater" && selection.type === "readLater") return true
-    if (s.type === "favorites" && selection.type === "favorites") return true
-    if (
-      s.type === "folder" &&
-      selection.type === "folder" &&
-      s.folderId === selection.folderId
-    )
-      return true
-    if (
-      s.type === "feed" &&
-      selection.type === "feed" &&
-      s.feedId === selection.feedId
-    )
-      return true
-    return false
   }
 
   const getFeedCount = (feedId: string) => articleCounts[feedId] ?? 0
@@ -112,12 +85,6 @@ export function Sidebar({
         await deleteFeed({ data: { id: deleteDialogItem.id } })
       }
       await onRefreshData()
-      if (
-        (selection.type === "folder" && selection.folderId === deleteDialogItem.id) ||
-        (selection.type === "feed" && selection.feedId === deleteDialogItem.id)
-      ) {
-        onSelect({ type: "all" })
-      }
     } catch (e) {
       console.error("Delete failed", e)
     } finally {
@@ -157,46 +124,30 @@ export function Sidebar({
           General
         </p>
 
-        <SidebarRow
-          id="sidebar-all-articles"
-          label="All Articles"
+        <SidebarNavLink
+          id="sidebar-explore"
+          label="Explore"
           count={totalCount}
-          active={isActive({ type: "all" })}
-          onClick={() => onSelect({ type: "all" })}
+          href="/"
+          active={pathname === "/"}
           badgeBlue
-          icon={<Newspaper className={`h-4 w-4 ${isActive({ type: "all" }) ? "text-white" : "text-zinc-400 group-hover:text-white"}`} />}
+          icon={<Newspaper className={`h-4 w-4 ${pathname === "/" ? "text-white" : "text-zinc-400 group-hover:text-white"}`} />}
         />
-        <SidebarRow
+        <SidebarNavLink
           id="sidebar-today"
           label="Today"
           count={todayCount}
-          active={isActive({ type: "today" })}
-          onClick={() => onSelect({ type: "today" })}
-          icon={<Calendar className={`h-4 w-4 ${isActive({ type: "today" }) ? "text-white" : "text-zinc-400 group-hover:text-white"}`} />}
+          href="/today"
+          active={pathname === "/today"}
+          icon={<Calendar className={`h-4 w-4 ${pathname === "/today" ? "text-white" : "text-zinc-400 group-hover:text-white"}`} />}
         />
-        <SidebarRow
-          id="sidebar-bookmarks"
-          label="Bookmarks"
-          count={bookmarksCount}
-          active={isActive({ type: "bookmarks" })}
-          onClick={() => onSelect({ type: "bookmarks" })}
-          icon={<Bookmark className={`h-4 w-4 ${isActive({ type: "bookmarks" }) ? "text-white" : "text-zinc-400 group-hover:text-white"}`} />}
-        />
-        <SidebarRow
-          id="sidebar-read-later"
-          label="Read Later"
-          count={readLaterCount}
-          active={isActive({ type: "readLater" })}
-          onClick={() => onSelect({ type: "readLater" })}
-          icon={<Clock className={`h-4 w-4 ${isActive({ type: "readLater" }) ? "text-white" : "text-zinc-400 group-hover:text-white"}`} />}
-        />
-        <SidebarRow
+        <SidebarNavLink
           id="sidebar-favorites"
           label="Favorites"
           count={favoritesCount}
-          active={isActive({ type: "favorites" })}
-          onClick={() => onSelect({ type: "favorites" })}
-          icon={<Heart className={`h-4 w-4 ${isActive({ type: "favorites" }) ? "text-white" : "text-zinc-400 group-hover:text-white"}`} />}
+          href="/favorites"
+          active={pathname === "/favorites"}
+          icon={<Heart className={`h-4 w-4 ${pathname === "/favorites" ? "text-white" : "text-zinc-400 group-hover:text-white"}`} />}
         />
       </div>
 
@@ -209,9 +160,11 @@ export function Sidebar({
         </p>
 
         {folders.map((folder) => {
+          const folderSlug = slugify(folder.name)
           const folderFeeds = feeds.filter((f) => f.folderId === folder.id)
           const count = folderFeeds.reduce((sum, f) => sum + (articleCounts[f.id] ?? 0), 0)
           const expanded = expandedFolders[folder.id] ?? false
+          const isFolderActive = pathname === `/${folderSlug}`
           return (
             <div key={folder.id}>
               <FolderContextMenu onRename={() => { }} onDelete={() => setTimeout(() => setDeleteDialogItem({ type: "folder", id: folder.id, name: folder.name }), 0)}>
@@ -220,23 +173,27 @@ export function Sidebar({
                   label={folder.name}
                   count={count}
                   expanded={expanded}
-                  active={isActive({ type: "folder", folderId: folder.id })}
+                  active={isFolderActive}
                   onArrowClick={() => toggleFolder(folder.id)}
-                  onLabelClick={() => onSelect({ type: "folder", folderId: folder.id })}
+                  folderSlug={folderSlug}
                 />
               </FolderContextMenu>
               {expanded &&
-                folderFeeds.map((feed) => (
-                  <FeedContextMenu key={feed.id} onRename={() => { }} onDelete={() => setTimeout(() => setDeleteDialogItem({ type: "feed", id: feed.id, name: feed.name }), 0)}>
-                    <FeedItem
-                      id={`feed-${feed.id}`}
-                      label={feed.name}
-                      count={getFeedCount(feed.id)}
-                      active={isActive({ type: "feed", feedId: feed.id })}
-                      onClick={() => onSelect({ type: "feed", feedId: feed.id })}
-                    />
-                  </FeedContextMenu>
-                ))}
+                folderFeeds.map((feed) => {
+                  const feedSlug = slugify(feed.name)
+                  const feedPath = `/${folderSlug}/${feedSlug}`
+                  return (
+                    <FeedContextMenu key={feed.id} onRename={() => { }} onDelete={() => setTimeout(() => setDeleteDialogItem({ type: "feed", id: feed.id, name: feed.name }), 0)}>
+                      <FeedItem
+                        id={`feed-${feed.id}`}
+                        label={feed.name}
+                        count={getFeedCount(feed.id)}
+                        active={pathname === feedPath}
+                        href={feedPath}
+                      />
+                    </FeedContextMenu>
+                  )
+                })}
             </div>
           )
         })}
@@ -252,17 +209,20 @@ export function Sidebar({
 
         {feeds
           .filter((f) => !f.folderId)
-          .map((feed) => (
-            <FeedContextMenu key={feed.id} onRename={() => { }} onDelete={() => setTimeout(() => setDeleteDialogItem({ type: "feed", id: feed.id, name: feed.name }), 0)}>
-              <SidebarRow
-                id={`standalone-${feed.id}`}
-                label={feed.name}
-                count={getFeedCount(feed.id)}
-                active={isActive({ type: "feed", feedId: feed.id })}
-                onClick={() => onSelect({ type: "feed", feedId: feed.id })}
-              />
-            </FeedContextMenu>
-          ))}
+          .map((feed) => {
+            const feedPath = `/folder/standalone/${feed.id}`
+            return (
+              <FeedContextMenu key={feed.id} onRename={() => { }} onDelete={() => setTimeout(() => setDeleteDialogItem({ type: "feed", id: feed.id, name: feed.name }), 0)}>
+                <SidebarNavLink
+                  id={`standalone-${feed.id}`}
+                  label={feed.name}
+                  count={getFeedCount(feed.id)}
+                  active={pathname === feedPath}
+                  href={feedPath}
+                />
+              </FeedContextMenu>
+            )
+          })}
       </div>
 
       <div className="flex-1" />
@@ -329,12 +289,12 @@ function FeedContextMenu({ children, onRename, onDelete }: { children: React.Rea
 
 // ─── Sub-components ────────────────────────────────
 
-function SidebarRow({
+function SidebarNavLink({
   id,
   label,
   count,
   active,
-  onClick,
+  href,
   badgeBlue,
   icon,
 }: {
@@ -342,14 +302,14 @@ function SidebarRow({
   label: string
   count: number
   active: boolean
-  onClick: () => void
+  href: string
   badgeBlue?: boolean
   icon?: React.ReactNode
 }) {
   return (
-    <button
+    <Link
+      to={href as any}
       id={id}
-      onClick={onClick}
       className={`group flex w-full items-center justify-between rounded-md px-3 py-1.5 text-left text-xs transition-colors ${active
           ? "bg-white/10 text-white"
           : "text-zinc-400 hover:bg-white/5 hover:text-white"
@@ -366,7 +326,7 @@ function SidebarRow({
       ) : (
         <span className="text-[10px] text-zinc-500">{count}</span>
       )}
-    </button>
+    </Link>
   )
 }
 
@@ -377,7 +337,7 @@ function FolderRow({
   expanded,
   active,
   onArrowClick,
-  onLabelClick,
+  folderSlug,
 }: {
   id: string
   label: string
@@ -385,7 +345,7 @@ function FolderRow({
   expanded: boolean
   active: boolean
   onArrowClick: () => void
-  onLabelClick: () => void
+  folderSlug: string
 }) {
   return (
     <div
@@ -404,12 +364,13 @@ function FolderRow({
             <ChevronRight className="h-3 w-3" />
           )}
         </button>
-        <button
-          onClick={onLabelClick}
+        <Link
+          to="/$folderSlug"
+          params={{ folderSlug }}
           className="min-w-0 flex-1 truncate text-left"
         >
           {label}
-        </button>
+        </Link>
       </div>
       <span className="ml-1 shrink-0 text-[10px] text-zinc-500">{count}</span>
     </div>
@@ -421,23 +382,23 @@ function FeedItem({
   label,
   count,
   active,
-  onClick,
+  href,
 }: {
   id: string
   label: string
   count: number
   active: boolean
-  onClick: () => void
+  href: string
 }) {
   return (
-    <button
+    <Link
+      to={href as any}
       id={id}
-      onClick={onClick}
       className={`flex w-full items-center justify-between rounded-r-md py-1.5 pl-6 pr-2 text-left text-[11px] transition-colors ${active ? "text-white" : "text-zinc-500 hover:text-zinc-300"
         }`}
     >
       <span className="truncate">{label}</span>
       <span className="ml-1 shrink-0 text-[10px] text-zinc-600">{count}</span>
-    </button>
+    </Link>
   )
 }

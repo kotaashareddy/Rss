@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { CompassIcon, Sun, Heart, BotIcon, TerminalIcon } from "lucide-react"
-import type { FolderRow, FeedRow, Selection } from "@/components/Sidebar"
+import { CompassIcon, Sun, Heart, TerminalIcon } from "lucide-react"
+import type { FolderRow, FeedRow } from "@/components/Sidebar"
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   folders: FolderRow[]
@@ -22,8 +22,6 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   totalCount: number
   todayCount: number
   favoritesCount: number
-  selection: Selection
-  onSelectionChange: (s: Selection) => void
   onFolderCreated: () => void
 }
 
@@ -34,8 +32,6 @@ export function AppSidebar({
   totalCount,
   todayCount,
   favoritesCount,
-  selection,
-  onSelectionChange,
   onFolderCreated,
   ...props
 }: AppSidebarProps) {
@@ -50,34 +46,24 @@ export function AppSidebar({
   const navMain = [
     {
       title: "Explore",
-      url: "#",
+      href: "/",
       icon: <CompassIcon />,
-      isActive: selection.type === "all",
-      onClick: () => onSelectionChange({ type: "all" }),
       badge: totalCount > 0 ? totalCount : undefined,
+      exact: true,
     },
     {
       title: "Today",
-      url: "#",
+      href: "/today",
       icon: <Sun />,
-      isActive: selection.type === "today",
-      onClick: () => onSelectionChange({ type: "today" }),
       badge: todayCount > 0 ? todayCount : undefined,
+      exact: true,
     },
     {
       title: "Favorites",
-      url: "#",
+      href: "/favorites",
       icon: <Heart />,
-      isActive: selection.type === "favorites",
-      onClick: () => onSelectionChange({ type: "favorites" }),
       badge: favoritesCount > 0 ? favoritesCount : undefined,
-    },
-    {
-      title: "AI",
-      url: "#",
-      icon: <BotIcon />,
-      isActive: selection.type === "ai" as any,
-      onClick: () => onSelectionChange({ type: "ai" } as any),
+      exact: true,
     },
   ]
 
@@ -88,13 +74,10 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navMain} />
-        {/* Folders section: Playground demo + real DB folders with + button */}
         <NavFolders
           folders={folders}
           feeds={feeds}
           articleCounts={articleCounts}
-          selection={selection}
-          onSelectionChange={onSelectionChange}
           onFolderCreated={onFolderCreated}
         />
       </SidebarContent>

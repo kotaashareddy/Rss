@@ -9,38 +9,119 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TodayRouteImport } from './routes/today'
+import { Route as FavoritesRouteImport } from './routes/favorites'
+import { Route as FolderSlugRouteImport } from './routes/$folderSlug'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FolderSlugIndexRouteImport } from './routes/$folderSlug.index'
+import { Route as FolderSlugFeedSlugRouteImport } from './routes/$folderSlug.$feedSlug'
 
+const TodayRoute = TodayRouteImport.update({
+  id: '/today',
+  path: '/today',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FavoritesRoute = FavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FolderSlugRoute = FolderSlugRouteImport.update({
+  id: '/$folderSlug',
+  path: '/$folderSlug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FolderSlugIndexRoute = FolderSlugIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => FolderSlugRoute,
+} as any)
+const FolderSlugFeedSlugRoute = FolderSlugFeedSlugRouteImport.update({
+  id: '/$feedSlug',
+  path: '/$feedSlug',
+  getParentRoute: () => FolderSlugRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$folderSlug': typeof FolderSlugRouteWithChildren
+  '/favorites': typeof FavoritesRoute
+  '/today': typeof TodayRoute
+  '/$folderSlug/$feedSlug': typeof FolderSlugFeedSlugRoute
+  '/$folderSlug/': typeof FolderSlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/favorites': typeof FavoritesRoute
+  '/today': typeof TodayRoute
+  '/$folderSlug/$feedSlug': typeof FolderSlugFeedSlugRoute
+  '/$folderSlug': typeof FolderSlugIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$folderSlug': typeof FolderSlugRouteWithChildren
+  '/favorites': typeof FavoritesRoute
+  '/today': typeof TodayRoute
+  '/$folderSlug/$feedSlug': typeof FolderSlugFeedSlugRoute
+  '/$folderSlug/': typeof FolderSlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/$folderSlug'
+    | '/favorites'
+    | '/today'
+    | '/$folderSlug/$feedSlug'
+    | '/$folderSlug/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/favorites' | '/today' | '/$folderSlug/$feedSlug' | '/$folderSlug'
+  id:
+    | '__root__'
+    | '/'
+    | '/$folderSlug'
+    | '/favorites'
+    | '/today'
+    | '/$folderSlug/$feedSlug'
+    | '/$folderSlug/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  FolderSlugRoute: typeof FolderSlugRouteWithChildren
+  FavoritesRoute: typeof FavoritesRoute
+  TodayRoute: typeof TodayRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/today': {
+      id: '/today'
+      path: '/today'
+      fullPath: '/today'
+      preLoaderRoute: typeof TodayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favorites': {
+      id: '/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof FavoritesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$folderSlug': {
+      id: '/$folderSlug'
+      path: '/$folderSlug'
+      fullPath: '/$folderSlug'
+      preLoaderRoute: typeof FolderSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +129,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$folderSlug/': {
+      id: '/$folderSlug/'
+      path: '/'
+      fullPath: '/$folderSlug/'
+      preLoaderRoute: typeof FolderSlugIndexRouteImport
+      parentRoute: typeof FolderSlugRoute
+    }
+    '/$folderSlug/$feedSlug': {
+      id: '/$folderSlug/$feedSlug'
+      path: '/$feedSlug'
+      fullPath: '/$folderSlug/$feedSlug'
+      preLoaderRoute: typeof FolderSlugFeedSlugRouteImport
+      parentRoute: typeof FolderSlugRoute
+    }
   }
 }
 
+interface FolderSlugRouteChildren {
+  FolderSlugFeedSlugRoute: typeof FolderSlugFeedSlugRoute
+  FolderSlugIndexRoute: typeof FolderSlugIndexRoute
+}
+
+const FolderSlugRouteChildren: FolderSlugRouteChildren = {
+  FolderSlugFeedSlugRoute: FolderSlugFeedSlugRoute,
+  FolderSlugIndexRoute: FolderSlugIndexRoute,
+}
+
+const FolderSlugRouteWithChildren = FolderSlugRoute._addFileChildren(
+  FolderSlugRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  FolderSlugRoute: FolderSlugRouteWithChildren,
+  FavoritesRoute: FavoritesRoute,
+  TodayRoute: TodayRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
