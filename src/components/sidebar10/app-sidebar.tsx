@@ -17,16 +17,17 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import {
-  HomeIcon,
-  SparklesIcon,
-  InboxIcon,
-  Settings2Icon,
+  Home,
+  Sparkles,
+  Inbox,
   Settings2,
-  MessageCircleQuestionIcon,
-  TerminalIcon,
-  SquareTerminalIcon,
-  BotIcon,
-  BookOpenIcon,
+  MessageCircleQuestion,
+  Terminal,
+  SquareTerminal,
+  Bot,
+  BookOpen,
+  Clock,
+  Heart,
 } from "lucide-react"
 import type { FolderRow, FeedRow, Selection } from "@/components/Sidebar"
 
@@ -48,7 +49,7 @@ const platformItems = [
   {
     title: "Playground",
     url: "#",
-    icon: SquareTerminalIcon,
+    icon: SquareTerminal,
     isActive: true,
     items: [
       { title: "History", url: "#" },
@@ -59,7 +60,7 @@ const platformItems = [
   {
     title: "Models",
     url: "#",
-    icon: BotIcon,
+    icon: Bot,
     items: [
       { title: "Genesis", url: "#" },
       { title: "Explorer", url: "#" },
@@ -69,7 +70,7 @@ const platformItems = [
   {
     title: "Documentation",
     url: "#",
-    icon: BookOpenIcon,
+    icon: BookOpen,
     items: [
       { title: "Introduction", url: "#" },
       { title: "Get Started", url: "#" },
@@ -106,7 +107,7 @@ export function AppSidebar({
   const teams = [
     {
       name: "RSS Reader",
-      logo: <TerminalIcon />,
+      logo: <Terminal />,
       plan: "Free",
     },
   ]
@@ -116,7 +117,7 @@ export function AppSidebar({
     {
       title: "All Articles",
       url: "#",
-      icon: <HomeIcon />,
+      icon: <Home />,
       isActive: selection.type === "all",
       onClick: () => onSelectionChange({ type: "all" }),
       badge: totalCount,
@@ -124,7 +125,7 @@ export function AppSidebar({
     {
       title: "Today",
       url: "#",
-      icon: <SparklesIcon />,
+      icon: <Sparkles />,
       isActive: selection.type === "today",
       onClick: () => onSelectionChange({ type: "today" }),
       badge: todayCount,
@@ -132,10 +133,26 @@ export function AppSidebar({
     {
       title: "Bookmarks",
       url: "#",
-      icon: <InboxIcon />,
+      icon: <Inbox />,
       isActive: selection.type === "bookmarks",
       onClick: () => onSelectionChange({ type: "bookmarks" }),
       badge: bookmarksCount,
+    },
+    {
+      title: "Read Later",
+      url: "#",
+      icon: <Clock />,
+      isActive: selection.type === "read-later",
+      onClick: () => onSelectionChange({ type: "read-later" }),
+      badge: readLaterCount,
+    },
+    {
+      title: "Favorites",
+      url: "#",
+      icon: <Heart />,
+      isActive: selection.type === "favorites",
+      onClick: () => onSelectionChange({ type: "favorites" }),
+      badge: favoritesCount,
     },
   ]
 
@@ -143,12 +160,12 @@ export function AppSidebar({
     {
       title: "Settings",
       url: "#",
-      icon: <Settings2Icon />,
+      icon: <Settings2 />,
     },
     {
       title: "Help",
       url: "#",
-      icon: <MessageCircleQuestionIcon />,
+      icon: <MessageCircleQuestion />,
     },
   ]
 
@@ -158,7 +175,7 @@ export function AppSidebar({
       name: f.name,
       url: "#",
       emoji: "📰",
-      onClick: () => onSelectionChange({ type: "feed", feedId: f.id }),
+      onClick: () => onSelectionChange({ type: "feed", feedId: f.id, folderId: f.folderId || "" }),
     }))
 
   const workspaces = folders.map((folder) => ({
@@ -170,9 +187,8 @@ export function AppSidebar({
       .map((f) => ({
         name: f.name,
         emoji: "📄",
-        onClick: (e?: React.MouseEvent) => {
-          e?.stopPropagation()
-          onSelectionChange({ type: "feed", feedId: f.id })
+        onClick: () => {
+          onSelectionChange({ type: "feed", feedId: f.id, folderId: folder.id })
         },
       })),
   }))

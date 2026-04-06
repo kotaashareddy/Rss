@@ -43,8 +43,9 @@ interface ArticleCardProps {
 }
 
 export function ArticleCard({ article, index }: ArticleCardProps) {
-  const { isFavorite: isZustandFavorite, toggleFavorite: toggleZustandFavorite } = useReaderStore()
-  const isFavorite = isZustandFavorite(article.id)
+  const favorites = useReaderStore((s) => s.favorites)
+  const toggleZustandFavorite = useReaderStore((s) => s.toggleFavorite)
+  const isFavorite = favorites.includes(article.id) || article.isFavorite
   const [sheetOpen, setSheetOpen] = useState(false)
   const domain = article.domain ?? getDomain(article.link)
   const fallbackColor = PASTEL_COLORS[index % PASTEL_COLORS.length]

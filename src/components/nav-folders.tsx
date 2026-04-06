@@ -241,8 +241,57 @@ export function NavFolders({
               </Collapsible>
             )
           })}
+
         </SidebarMenu>
       </SidebarGroup>
+
+      {/* Render Standalone Feeds (folderId === null) in their own separate group */}
+      {feeds.filter((f) => !f.folderId).length > 0 && (
+        <SidebarGroup className="group-data-[collapsible=icon]:hidden pt-0">
+          <SidebarGroupLabel>Other Feeds</SidebarGroupLabel>
+          <SidebarMenu>
+            {feeds
+              .filter((f) => !f.folderId)
+              .map((feed) => {
+                const feedSlug = slugify(feed.name)
+                const feedCount = articleCounts[feed.id] || 0
+                const isFeedActive = pathname === `/feed/${feedSlug}`
+
+                return (
+                  <ContextMenu key={feed.id}>
+                    <ContextMenuTrigger>
+                      <SidebarMenuItem>
+                        <SidebarMenuButton
+                          isActive={isFeedActive}
+                          onClick={() => navigate({ to: "/feed/$feedSlug", params: { feedSlug } })}
+                        >
+                          <span className="truncate">{feed.name}</span>
+                          {feedCount > 0 && (
+                            <span className="ml-auto text-xs text-muted-foreground mr-1">
+                              {feedCount}
+                            </span>
+                          )}
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    </ContextMenuTrigger>
+                    <ContextMenuContent>
+                      <ContextMenuItem onClick={() => handleRename("feed", feed.id, feed.name)}>
+                        <Edit2 className="mr-2 size-4" /> Rename
+                      </ContextMenuItem>
+                      <ContextMenuSeparator />
+                      <ContextMenuItem
+                        onClick={() => setDeleteData({ type: "feed", id: feed.id, name: feed.name })}
+                        className="text-red-600 focus:text-red-600"
+                      >
+                        <Trash2 className="mr-2 size-4" /> Delete
+                      </ContextMenuItem>
+                    </ContextMenuContent>
+                  </ContextMenu>
+                )
+              })}
+          </SidebarMenu>
+        </SidebarGroup>
+      )}
 
       <AddFolderModal
         open={addFolderOpen}

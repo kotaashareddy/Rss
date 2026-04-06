@@ -36,6 +36,8 @@ export interface FolderRow {
 export type Selection =
   | { type: "all" }
   | { type: "today" }
+  | { type: "bookmarks" }
+  | { type: "read-later" }
   | { type: "favorites" }
   | { type: "folder"; folderId: string }
   | { type: "feed"; feedId: string; folderId: string }

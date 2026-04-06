@@ -3,7 +3,7 @@ import { getAllData } from "@/server/rss"
 import { RSSShell } from "@/components/RSSShell"
 import { slugify } from "@/lib/slugify"
 
-export const Route = createFileRoute("/$folderSlug/$feedSlug")({
+export const Route = createFileRoute("/$folderSlug/$feedSlug/")({
   loader: async ({ params }) => {
     const data = await getAllData()
     const folder = data.folders.find((f) => slugify(f.name) === params.folderSlug)
@@ -34,10 +34,13 @@ function FeedPage() {
     )
   }
 
+  const folder = data.folders.find((f) => f.id === folderId)
+
   return (
     <RSSShell
       initialData={{ folders: data.folders, feeds: data.feeds, articles: data.articles as any }}
       title={feedName || "Feed"}
+      folderName={folder?.name}
       folderId={folderId ?? undefined}
       filterArticles={(articles) => articles.filter((a) => a.feedId === feedId)}
     />

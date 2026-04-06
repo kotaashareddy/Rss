@@ -17,7 +17,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
-import { ChevronRightIcon, PlusIcon, MoreHorizontalIcon } from "lucide-react"
+import { ChevronRight, Plus, MoreHorizontal } from "lucide-react"
 
 export function NavWorkspaces({
   workspaces,
@@ -50,11 +50,11 @@ export function NavWorkspaces({
                   className="left-2 bg-sidebar-accent text-sidebar-accent-foreground data-open:rotate-90"
                   showOnHover
                 >
-                  <ChevronRightIcon
+                  <ChevronRight
                   />
                 </SidebarMenuAction>
                 <SidebarMenuAction showOnHover>
-                  <PlusIcon
+                  <Plus
                   />
                 </SidebarMenuAction>
                 <CollapsibleContent>
@@ -74,7 +74,7 @@ export function NavWorkspaces({
           ))}
           <SidebarMenuItem>
             <SidebarMenuButton className="text-sidebar-foreground/70">
-              <MoreHorizontalIcon
+              <MoreHorizontal
               />
               <span>More</span>
             </SidebarMenuButton>

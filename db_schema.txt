@@ -1,0 +1,9 @@
+Table: folders
+Columns: id, name, created_at
+
+Table: feeds
+Columns: id, name, url, folder_id, include_keywords, exclude_keywords, created_at
+
+Table: articles
+Columns: id, feed_id, title, description, link, image, published_at, is_used, visit_count, is_bookmarked, is_read_later, is_favorite, created_at
+

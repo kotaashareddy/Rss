@@ -11,16 +11,18 @@ export const Route = createFileRoute("/today")({
 
 function TodayPage() {
   const data = Route.useLoaderData()
-  const todayStart = new Date()
-  todayStart.setHours(0, 0, 0, 0)
 
   return (
     <RSSShell
       initialData={{ folders: data.folders, feeds: data.feeds, articles: data.articles as any }}
       title="Today"
-      filterArticles={(articles) =>
-        articles.filter((a) => a.publishedAt && new Date(a.publishedAt) >= todayStart)
-      }
+      skipDateFilter
+      filterArticles={(articles) => {
+        // compute at render time so the cutoff is always "start of today"
+        const todayStart = new Date()
+        todayStart.setHours(0, 0, 0, 0)
+        return articles.filter((a) => a.publishedAt && new Date(a.publishedAt) >= todayStart)
+      }}
     />
   )
 }
