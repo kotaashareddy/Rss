@@ -1,11 +1,11 @@
 <div align="center">
   <img src="src/logo.svg" alt="RSS Reader Logo" width="150" height="150" />
 
-  [![Build Status](https://img.shields.io/github/actions/workflow/status/vyshn/rss/build.yml?branch=main&style=flat-square)](https://github.com/vyshn/rss/actions)
-  [![Version](https://img.shields.io/github/package-json/v/vyshn/rss?style=flat-square)](https://github.com/vyshn/rss/releases)
+  [![Build Status](https://img.shields.io/github/actions/workflow/status/kotaashareddy/Rss/build.yml?branch=main&style=flat-square)](https://github.com/kotaashareddy/Rss/actions)
+  [![Version](https://img.shields.io/github/package-json/v/kotaashareddy/Rss?style=flat-square)](https://github.com/kotaashareddy/Rss/releases)
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-  [![Contributors](https://img.shields.io/github/contributors/vyshn/rss?style=flat-square)](https://github.com/vyshn/rss/graphs/contributors)
-  [![Stars](https://img.shields.io/github/stars/vyshn/rss?style=flat-square)](https://github.com/vyshn/rss/stargazers)
+  [![Contributors](https://img.shields.io/github/contributors/kotaashareddy/Rss?style=flat-square)](https://github.com/kotaashareddy/Rss/graphs/contributors)
+  [![Stars](https://img.shields.io/github/stars/kotaashareddy/Rss?style=flat-square)](https://github.com/kotaashareddy/Rss/stargazers)
 
   # Modern RSS Reader
   *A local-first, self-hostable feed aggregator built with React 19 and SQLite — no cloud, no tracking, just reading.*
@@ -17,7 +17,7 @@
 
 Get up and running in a single command (requires Node.js & Git):
 ```bash
-git clone https://github.com/vyshn/rss.git && cd rss && npm install && npm run dev
+git clone https://github.com/kotaashareddy/Rss.git && cd Rss && npm install && npm run dev
 ```
 
 ---
@@ -91,8 +91,8 @@ Before you set up this project locally, ensure you have the following installed:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/vyshn/rss.git
-   cd rss
+   git clone https://github.com/kotaashareddy/Rss.git
+   cd Rss
    ```
 
 2. **Install dependencies**
@@ -227,7 +227,7 @@ We are committed to providing a welcoming, inclusive, and harassment-free experi
 - [ ] Connect with third-party RSS providers (Feedly, Inoreader via OAuth)
 - [ ] Build a Progressive Web App (PWA) manifest for standalone installations.
 
-See the [open issues](https://github.com/vyshn/rss/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/kotaashareddy/Rss/issues) for a full list of proposed features (and known issues).
 
 ## ❓ FAQ
 
@@ -248,8 +248,8 @@ A: Some feeds have intensive rate limits. Ensure the Nitro server syncing middle
 
 ## 👥 Contributors / Authors
 
-<a href="https://github.com/vyshn/rss/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=vyshn/rss" alt="Contributors" />
+<a href="https://github.com/kotaashareddy/Rss/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=kotaashareddy/Rss" alt="Contributors" />
 </a>
 
 ## 🙏 Acknowledgements
