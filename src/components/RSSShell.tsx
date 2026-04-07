@@ -180,7 +180,6 @@ export function RSSShell({
           {/* Left: sidebar toggle + separator + breadcrumb */}
           <div className="flex shrink-0 items-center gap-2">
             <SidebarTrigger className="shrink-0" />
-            <Separator orientation="vertical" className="h-4 bg-zinc-700" />
             <div className="flex items-center gap-1">
               {folderName ? (
                 <>
@@ -213,7 +212,6 @@ export function RSSShell({
                 id="date-filter-btn"
                 className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border px-3 text-xs font-medium transition-colors border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white"
               >
-                <Filter className="h-3.5 w-3.5 text-zinc-400" />
                 {selectedOption.label}
                 <ChevronDown className="h-3 w-3 opacity-60" />
               </DropdownMenuTrigger>
