@@ -38,25 +38,32 @@ export default defineEventHandler(async (event) => {
     const folderSlug = slugParts[0]
     const folder = folders.find((f) => slugify(f.name) === folderSlug)
 
-    if (!folder) {
-      // Let it fall through or throw 404
-      return
-    }
-
     let targetFeedIds: string[] = []
-    let channelTitle = folder.name
+    let channelTitle = ""
 
-    if (slugParts.length === 1) {
-      targetFeedIds = allFeeds.filter((f) => f.folder_id === folder.id).map((f) => f.id)
-    } else if (slugParts.length === 2) {
+    if (folder) {
+      channelTitle = folder.name
+      if (slugParts.length === 1) {
+        targetFeedIds = allFeeds.filter((f) => f.folder_id === folder.id).map((f) => f.id)
+      } else if (slugParts.length === 2) {
+        const feedSlug = slugParts[1]
+        const feed = allFeeds.find((f) => f.folder_id === folder.id && slugify(f.name) === feedSlug)
+        if (feed) {
+          targetFeedIds = [feed.id]
+          channelTitle = feed.name
+        }
+      }
+    } else if (slugParts.length === 2 && slugParts[0] === "feed") {
+      // Standalone feed fallback (e.g. /feed/my-feed/feed)
       const feedSlug = slugParts[1]
-      const feed = allFeeds.find((f) => f.folder_id === folder.id && slugify(f.name) === feedSlug)
-      if (!feed) return
-      targetFeedIds = [feed.id]
-      channelTitle = feed.name
-    } else {
-      return
+      const feed = allFeeds.find((f) => !f.folder_id && slugify(f.name) === feedSlug)
+      if (feed) {
+        targetFeedIds = [feed.id]
+        channelTitle = feed.name
+      }
     }
+
+    if (targetFeedIds.length === 0) return
 
     const placeholders = targetFeedIds.map(() => "?").join(",")
     const articles = targetFeedIds.length > 0
@@ -88,8 +95,7 @@ ${itemsXml}
 </rss>`
 
     setResponseHeader(event, "Content-Type", "application/rss+xml; charset=utf-8")
-    // Use res.end for immediate response in dev environment
-    event.node.res.end(xml)
+    return xml
   } catch (err) {
     console.error("RSS Middleware Error:", err)
   } finally {
